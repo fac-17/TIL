@@ -1,0 +1,234 @@
+# TIL
+
+## Gigi
+How to set-up, run and use SASS
+```
+npm i -D node-sass
+```
+Add in package.json a script
+```
+    "sass": "node-sass --watch public/sass -o public/css"
+```
+![](https://i.imgur.com/043wDE8.png)
+In your public create a sass folder with style.sass file.
+Then in your terminal run:
+```
+npm run sass
+```
+This will generate style.css which will eventually get injected in your project when you run your live server. Read more [here](https://sass-lang.com/guide).
+
+## Jan
+in express, `app.render` as opposed to `res.render` does not send response but in callback  (err,html)=>{} provides string that would be sent as a response
+https://expressjs.com/en/api.html#app.render
+
+## Georgia
+Multi page form - https://www.w3schools.com/howto/howto_js_form_steps.asp
+
+## Leonie
+- Adding a link that allows user to create a calendar event on Google, Outlook, iCal etc: 
+    - [Adding event in browser](https://github.com/InteractionDesignFoundation/add-event-to-calendar-docs)
+    - [Adding event via ics file](https://github.com/nwcell/ics.js/blob/master/demo/demo.html)
+
+
+## Sarah
+Project organisation not only for the SCRUM but for the whole team : 
+- Filling ALL of the parameters of the issues and of the pull request :
+    - project (link to the project)
+    - label (only the SCRUM are creating them for more clarity)
+    - tick box (easy for the team to know the progression and help on splitting the work)
+
+
+
+
+## Vic
+- Using node-fetch module to make three-line api calls from the backend is a JOY:
+https://www.npmjs.com/package/node-fetch
+```js
+const url = "https://someapi.com";
+const fetch = require('node-fetch');
+
+fetch(url)
+  .then(data => data.json())
+  .then(data => console.log(data))
+  .catch(err => console.log(err))
+```
+
+
+
+## Colette
+
+- When specifying a language for a snippet of code in markdown, "diff" is also an option. For example:
+    ```diff
+    function eatBabies() {
+    -var baby = baby;
+    +var baby = "baby";
+    }
+    ```
+    
+## Andy 
+
+* The difference between`target` and `currentTarget`:
+    * `target` is the element that triggered the event (e.g., the user clicked on)
+    * `currentTarget` is the element that the event listener is attached to
+
+
+
+
+
+## Martha 
+
+* You can add "formaction" of an input to alter the re-direct of the action propery in the form --> 
+
+![](https://i.imgur.com/tSrQvMc.png)
+
+
+
+## Tony
+- Database queries used in express are created as promises that need to be resolved. 
+```javascript=
+queries.getAllPlans()
+.then(result => { 
+res.render("mealPlans", { mealPlan: result.rows })
+})
+```
+
+
+## Gregor
+Using tape-promise in order to make your tape tests run in the right order.
+
+```javascript=
+const tape = require("tape");
+const _test = require("tape-promise").default;
+
+const test = _test(tape);
+```
+
+To avoid this: 
+
+![](https://i.imgur.com/m0iJ1d1.png =450x)
+
+
+## Reuben
+
+- Destructuring an object into variables that have already been declared.
+- the syntax is to put a pair of round brackets around your regular destructuring syntax.
+
+```javascript=
+let userName, postcode, friendName, friendPostcode, date, time;
+const functionWithNestedScope = (objectToDestructure) => {
+({ userName, postcode, friendName, friendPostcode, date, time } = objectToDestructure);
+}
+```
+- the variables can be declared in global scope but assigned values within a function
+
+https://celsiusnotes.com/destructure-object-without-declaration/
+
+## Emaggy
+Useful to create 3 database environments for DevOps purposes
+
+```js
+if (process.env.NODE_ENV === "test") {
+  DB_URL = process.env.TEST_DB_URL;
+} else if (process.env.NODE_ENV === "local") {
+  DB_URL = process.env.LOCAL_DB_URL;
+} else if (process.env.NODE_ENV === "production") {
+  DB_URL = process.env.PLANTBASE_DB_URL;
+}
+```
+
+## Jack
+
+### TIL - specify foreign keys in SQL schemas.
+"A FOREIGN KEY is a field (or collection of fields) in one table that refers to the PRIMARY KEY in another table.
+
+
+This is done using REFERENCES keyword
+
+```=SQL
+CREATE TABLE categories
+(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE products
+(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    category_id INTEGER NOT NULL REFERENCES categories (id)
+);
+```
+
+#### Benefits:
+* The FOREIGN KEY constraint is used to prevent actions that would destroy links between tables.
+
+* The FOREIGN KEY constraint also prevents invalid data from being inserted into the foreign key column, because it has to be one of the values contained in the table it points to.
+
+More info: https://www.w3schools.com/sql/sql_foreignkey.asp
+
+## Christine
+
+- creating a triangle in css in a suprisingly easy way 
+``` javascript
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: 50vw solid transparent;
+  border-right: 50vw solid transparent;
+  border-top: 8vw solid var(--lightblue);
+}
+```
+- how to solve issues with travis "not finding env"
+
+## Sam
+Promises hell exists. You can just do easier things (queries or just sort through data on front end a little)
+``` javascript
+const getRatingsSummaryOfList = productList => {
+  let p1 = new Promise((reject, resolve) => {
+    resolve(
+      productList.map(product => {
+        return getRatingsByProduct(product.id).then(ratings => {
+          product.avg_rating =
+            ratings.reduce((acc, r) => acc + r.rating, 0) / ratings.length;
+
+          product.top_comment = ratings.reduce(
+            (acc, r) => (r.rating > acc.rating ? r : acc),
+            { rating: 0 }
+          ).comment;
+          return product;
+        });
+      })
+    );
+  });
+  
+  p1.then(val => console.log(val));
+  
+  Promise.all(promises).then(function(results) {
+    return results;
+  });
+};
+```
+
+Just working out SQL joins instead and accepting I need two of them
+``` psql
+SELECT p.id, product_name, product_description, product_image, averages
+FROM products p
+JOIN (
+    SELECT product_id, AVG(rating) AS averages
+    FROM ratings
+    GROUP BY product_id
+) AS r
+ON r.product_id = p.id;
+```
+
+``` psql
+SELECT comment, votes, product_id
+FROM ratings
+WHERE product_id = 1
+ORDER BY votes DESC
+LIMIT 1;
+```
+
+## Francesca 
+
+Existence of a Development database 
